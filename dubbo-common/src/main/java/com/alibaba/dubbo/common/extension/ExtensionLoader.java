@@ -512,30 +512,45 @@ public class ExtensionLoader<T> {
     }
 
     private T injectExtension(T instance) {
-        try {
-            if (objectFactory != null) {
-                for (Method method : instance.getClass().getMethods()) {
-                    if (method.getName().startsWith("set")
-                            && method.getParameterTypes().length == 1
-                            && Modifier.isPublic(method.getModifiers())) {
-                        Class<?> pt = method.getParameterTypes()[0];
-                        try {
-                            String property = method.getName().length() > 3 ? method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4) : "";
-                            Object object = objectFactory.getExtension(pt, property);
-                            if (object != null) {
-                                method.invoke(instance, object);
-                            }
-                        } catch (Exception e) {
-                            logger.error("fail to inject via method " + method.getName()
-                                    + " of interface " + type.getName() + ": " + e.getMessage(), e);
-                        }
-                    }
-                }
+        if (objectFactory == null) {
+            return instance;
+        }
+        for (Method method : instance.getClass().getMethods()) {
+            if (isPublicSetter(method)) {
+                injectDependencyBySetter(instance, method);
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
         }
         return instance;
+    }
+
+    private boolean isPublicSetter(Method method) {
+        return method.getName().startsWith("set")
+                && method.getParameterTypes().length == 1
+                && Modifier.isPublic(method.getModifiers());
+    }
+
+    private void injectDependencyBySetter(T instance, Method method) {
+        Class<?> paramType = method.getParameterTypes()[0];
+        String propertyName = getPropertyName(method.getName());
+        Object paramValue = findBeanInObjectFactoryByTypeAndName(paramType, propertyName);
+        if (paramValue == null) {
+            return;
+        }
+        try {
+            method.invoke(instance, paramValue);
+        } catch (Exception e) {
+            logger.error("fail to inject via method " + method.getName()
+                    + " of interface " + type.getName() + ": " + e.getMessage(), e);
+        }
+    }
+
+    private Object findBeanInObjectFactoryByTypeAndName(Class<?> paramType, String propertyName) {
+        return objectFactory.getExtension(paramType, propertyName);
+    }
+
+
+    private String getPropertyName(String methodName) {
+        return methodName.length() > 3 ? methodName.substring(3, 4).toLowerCase() + methodName.substring(4) : "";
     }
 
     private Class<?> getExtensionClass(String name) {
