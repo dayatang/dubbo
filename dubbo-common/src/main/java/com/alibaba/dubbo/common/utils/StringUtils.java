@@ -50,9 +50,7 @@ public final class StringUtils {
 	
 	public static boolean isBlank(String str)
 	{
-		if( str == null || str.length() == 0 )
-			return true;
-		return false;
+		return str == null || str.isEmpty() || str.trim().isEmpty();
 	}
 
 	/**
@@ -63,9 +61,7 @@ public final class StringUtils {
 	 */
 	public static boolean isEmpty(String str)
 	{
-		if( str == null || str.length() == 0 )
-			return true;
-		return false;
+		return str == null || str.isEmpty();
 	}
 
 	/**
@@ -76,7 +72,7 @@ public final class StringUtils {
 	 */
     public static boolean isNotEmpty(String str)
     {
-        return str != null && str.length() > 0;
+        return !isEmpty(str);
     }
     
     /**
