@@ -620,12 +620,15 @@ public class ExtensionLoader<T> {
         if (StringUtils.isBlank(line)) {
             return;
         }
+        String name = null;
         String[] keyValue = line.split("=");
-        if (keyValue.length < 2) {
+        name = keyValue[0];
+        if (keyValue.length > 1) {
+            line = keyValue[1];
+        }
+        if (line.isEmpty()) {
             return;
         }
-        String name = keyValue[0];
-        line = keyValue[1];
         try {
             Class<?> clazz = Class.forName(line, true, classLoader);
             if (!type.isAssignableFrom(clazz)) {
