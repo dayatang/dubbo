@@ -514,9 +514,9 @@ public class ExtensionLoader<T> {
         for (Method method : instance.getClass().getMethods()) {
             if (isPublicSetter(method)) {
                 Class<?> paramType = method.getParameterTypes()[0];
+                String propertyName = extractPropertyNameFromSetter(method.getName());
+                Object object = objectFactory.getExtension(paramType, propertyName);
                 try {
-                    String property = extractPropertyNameFromSetter(method.getName());
-                    Object object = objectFactory.getExtension(paramType, property);
                     if (object != null) {
                         method.invoke(instance, object);
                     }
