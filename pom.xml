@@ -150,6 +150,11 @@
 		<dependencies>
 			<!-- Common libs -->
 			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>18.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
 				<version>${spring_version}</version>
